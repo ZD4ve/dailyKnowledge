@@ -22,3 +22,5 @@ for article in articles:
     print(article.title)
     print(article.summary)
     #print(article.text[:300])
+
+    

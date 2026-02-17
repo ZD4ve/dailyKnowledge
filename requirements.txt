@@ -1,1 +1,4 @@
 newspaper4k[all]
+pyyaml
+openai
+python-dotenv

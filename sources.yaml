@@ -1,0 +1,15 @@
+categories:
+  - name: "Magyar"
+    sources:
+      - name: "Telex"
+        url: "telex.hu"
+        preference: "Belpolitika, Fontosabb országos hírek"
+      - name: "Index"
+        url: "index.hu"
+        preference: "Belpolitika, Fontosabb országos hírek"
+
+  - name: "Pénzügy"
+    sources:
+      - name: "Financial Times"
+        url: "ft.com"
+        preference: "Pénzügyi hírek, globális gazdasági fejlemények"
