@@ -17,6 +17,7 @@ def init_db() -> None:
             """
             CREATE TABLE IF NOT EXISTS articles (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                site_name TEXT,
                 url TEXT UNIQUE NOT NULL,
                 title TEXT,
                 text TEXT,
@@ -28,7 +29,7 @@ def init_db() -> None:
         )
 
 
-def save_article(url: str, title: str, text: str,
+def save_article(site_name: str, url: str, title: str, text: str,
                  authors: list[str] | None = None,
                  publish_date: datetime | None = None) -> None:
     """Save a single article to the database (skip if URL already exists)."""
@@ -36,10 +37,10 @@ def save_article(url: str, title: str, text: str,
     with _get_connection() as conn:
         conn.execute(
             """
-            INSERT OR IGNORE INTO articles (url, title, text, authors, publish_date)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT OR IGNORE INTO articles (site_name, url, title, text, authors, publish_date)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (url, title, text, authors_str, publish_date),
+            (site_name, url, title, text, authors_str, publish_date),
         )
 
 

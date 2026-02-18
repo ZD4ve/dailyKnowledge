@@ -19,11 +19,11 @@ def get_all_urls() -> list[str]:
     ]
 
 
-def get_preference(url: str) -> str | None:
-    """Return the preference string for the source matching the given URL, or None."""
+def get_preference(name: str) -> str | None:
+    """Return the preference string for the source matching the given name (case-insensitive)."""
     config = _load_config()
     for category in config.get("categories", []):
         for source in category.get("sources", []):
-            if source["url"] == url:
+            if source["name"].lower() == name.lower():
                 return source.get("preference")
     return None

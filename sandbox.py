@@ -11,10 +11,10 @@ DELAY = 60 / RATE_LIMIT
 # 1. Scrape the first site from config
 first_url = get_all_urls()[0]
 #print(f"Scraping {first_url}...")
-#scrape(first_url)
+scrape(first_url)
 
 # 2. Get all stored articles
-articles = get_articles_by_url(first_url)[:20]
+articles = get_articles_by_url(first_url)[:3]
 print(f"Scoring {len(articles)} articles...\n")
 
 # 3. Score each article with progress bar (throttled to stay within rate limit)

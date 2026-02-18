@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import json
 
 from config import get_preference
-from helper import extract_site_from
 
 
 load_dotenv()
@@ -24,8 +23,7 @@ class RelevanceScore(BaseModel):
 def estimate(article: dict) -> int | None:
     """Send an article to the AI and return a relevance score (0-9) via structured output."""
 
-    #retrive preference for the article's source URL
-    preference = get_preference(extract_site_from(article.get("url", "")))
+    preference = get_preference(article.get("site_name", ""))
     if preference is None:
         return None
 

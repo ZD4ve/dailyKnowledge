@@ -2,7 +2,7 @@ categories:
   - name: "Magyar"
     sources:
       - name: "Telex"
-        url: "telex.hu"
+        url: "telex.hu/belfold/"
         preference: "Belpolitika, Fontosabb országos hírek"
       - name: "Index"
         url: "index.hu"
