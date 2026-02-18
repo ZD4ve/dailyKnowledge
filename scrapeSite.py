@@ -3,7 +3,7 @@ from db import get_processed_urls, save_article
 from helper import extract_site_from
 
 
-def scrape(url: str, site_name: str) -> None:
+def scrape(site_name: str, url: str) -> None:
     """
     Scrape articles from the given URL and save them to the database
     if not already processed. Uses Newspaper4k bulk download.

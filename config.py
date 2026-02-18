@@ -9,11 +9,11 @@ def _load_config() -> dict:
         return yaml.safe_load(f)
 
 
-def get_all_urls() -> list[str]:
-    """Return a flat list of all source URLs from every category."""
+def get_all_urls() -> list[tuple[str, str]]:
+    """Return a flat list of (name, url) tuples from every category."""
     config = _load_config()
     return [
-        source["url"]
+        (source["name"], source["url"])
         for category in config.get("categories", [])
         for source in category.get("sources", [])
     ]

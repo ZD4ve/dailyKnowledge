@@ -9,9 +9,9 @@ RATE_LIMIT = 15  # requests per minute
 DELAY = 60 / RATE_LIMIT 
 
 # 1. Scrape the first site from config
-first_url = get_all_urls()[0]
-#print(f"Scraping {first_url}...")
-scrape(first_url)
+first_name, first_url = get_all_urls()[0]
+#print(f"Scraping {first_name} ({first_url})...")
+scrape(first_url,first_name)
 
 # 2. Get all stored articles
 articles = get_articles_by_url(first_url)[:3]
