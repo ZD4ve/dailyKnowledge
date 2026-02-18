@@ -1,38 +1,44 @@
-import time
-from tqdm import tqdm
+import asyncio
+from tqdm.asyncio import tqdm as atqdm
 from config import get_all_urls
 from scrapeSite import scrape
 from db import get_articles_by_url
-from estimateUsefullness import estimate
+from estimateUsefullness import async_estimate, AsyncRateLimiter
 
 RATE_LIMIT = 15  # requests per minute
-DELAY = 60 / RATE_LIMIT 
 
 # 1. Scrape the first site from config
 first_name, first_url = get_all_urls()[0]
 #print(f"Scraping {first_name} ({first_url})...")
-scrape(first_url,first_name)
+scrape(first_name, first_url)
 
 # 2. Get all stored articles
-articles = get_articles_by_url(first_url)[:3]
+articles = get_articles_by_url(first_url)
 print(f"Scoring {len(articles)} articles...\n")
 
-# 3. Score each article with progress bar (throttled to stay within rate limit)
-results = []
-for i, a in enumerate(tqdm(articles, desc="Estimating relevance")):
-    start = time.time()
-    score = estimate(a)
-    results.append((score, a["title"], a["url"]))
-    elapsed = time.time() - start
-    remaining = DELAY - elapsed
-    if i < len(articles) - 1 and remaining > 0:
-        time.sleep(remaining)
 
-# 4. Print sorted by relevance (highest first)
-results.sort(key=lambda x: x[0] if x[0] is not None else -1, reverse=True)
-for score, title, url in results:
-    print(f"[{score}] {title}\n    {url}\n")
+async def main():
+    rate_limiter = AsyncRateLimiter(RATE_LIMIT)
+
+    # 3. Fire off all tasks — rate limiter handles spacing
+    async def process(article: dict) -> tuple | None:
+        result = await async_estimate(article, rate_limiter)
+        if result is None:
+            return None
+        score, summary = result
+        return score, summary, article["title"], article["url"]
+
+    tasks = [process(a) for a in articles]
+    results = []
+    for coro in atqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Estimating relevance"):
+        result = await coro
+        if result is not None:
+            results.append(result)
+
+    # 4. Print sorted by relevance (highest first)
+    results.sort(key=lambda x: x[0], reverse=True)
+    for score, summary, title, url in results:
+        print(f"[{score}] {title}\n    {summary}\n    {url}\n")
 
 
-#TODO: ASYNC IMPLEMENTATION USING THREADING OR ASYNCIO TO HANDLE MULTIPLE ARTICLES IN PARALLEL WHILE RESPECTING RATE LIMIT
-#maybe use this as a reference: https://medium.com/@Aman-tech/how-make-async-calls-to-openais-api-cfc35f252ebd
+asyncio.run(main())

@@ -4,12 +4,15 @@ categories:
       - name: "Telex"
         url: "telex.hu/belfold/"
         preference: "Belpolitika, Fontosabb országos hírek"
+        language: "Hungarian"
       - name: "Index"
         url: "index.hu"
         preference: "Belpolitika, Fontosabb országos hírek"
+        language: "Hungarian"
 
   - name: "Pénzügy"
     sources:
       - name: "Financial Times"
         url: "ft.com"
         preference: "Pénzügyi hírek, globális gazdasági fejlemények"
+        language: "English"

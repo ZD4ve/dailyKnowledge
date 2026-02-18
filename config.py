@@ -27,3 +27,13 @@ def get_preference(name: str) -> str | None:
             if source["name"].lower() == name.lower():
                 return source.get("preference")
     return None
+
+
+def get_language(name: str) -> str | None:
+    """Return the language for the source matching the given name (case-insensitive)."""
+    config = _load_config()
+    for category in config.get("categories", []):
+        for source in category.get("sources", []):
+            if source["name"].lower() == name.lower():
+                return source.get("language")
+    return None

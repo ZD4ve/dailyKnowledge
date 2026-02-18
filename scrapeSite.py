@@ -12,6 +12,9 @@ def scrape(site_name: str, url: str) -> None:
     base_url = f"https://{extract_site_from(url)}"
     source = newspaper.build(base_url)
 
+    #for debugging:
+    for article in source.articles:
+        print(article.url)
 
     #Filtering
     filter = f"https://{url}"
