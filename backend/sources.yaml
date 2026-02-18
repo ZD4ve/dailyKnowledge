@@ -6,7 +6,7 @@ categories:
         preference: "Belpolitika, Fontosabb országos hírek"
         language: "Hungarian"
       - name: "Index"
-        url: "index.hu"
+        url: "index.hu/belfold/"
         preference: "Belpolitika, Fontosabb országos hírek"
         language: "Hungarian"
 

@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime
 import logging
 from contextlib import asynccontextmanager
 
@@ -6,10 +7,12 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import FastAPI
 
-from config import get_all_urls
-from db import get_all_articles, get_unscored_articles, set_score
-from llmRelevance import AsyncRateLimiter, async_estimate, RATE_LIMIT
+from config import get_all_urls, get_sites_by_category
+import db 
+from estimateRelevance import async_process_articles
 from scrapeSite import scrape
+import config
+
 
 logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
@@ -26,22 +29,8 @@ def task_scrape_all() -> None:
 
 async def task_score_unscored() -> None:
     """Score all articles that have not been scored yet."""
-    articles = get_unscored_articles()
-    if not articles:
-        logger.info("No unscored articles.")
-        return
-
-    logger.info(f"Scoring {len(articles)} articles...")
-    rate_limiter = AsyncRateLimiter(RATE_LIMIT)
-
-    async def process(article):
-        result = await async_estimate(article, rate_limiter)
-        if result is not None:
-            score, summary = result
-            set_score(article.url, score, summary)
-
-    await asyncio.gather(*[process(a) for a in articles])
-    logger.info("Scoring complete.")
+    logger.info("Scoring unscored articles...")
+    await async_process_articles()
 
 
 # --- FastAPI app ---
@@ -76,32 +65,46 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/articles")
 def list_articles():
-    return get_all_articles()
+    return db.get_all_articles()
 
+@app.get("/categories")
+def list_categories():
+    return config.get_categories()
 
-@app.get("/articles/unscored")
-def list_unscored():
-    return get_unscored_articles()
+@app.get("/categories/{category}")
+def list_sites_by_category(category: str):
+    return get_sites_by_category(category)
 
+@app.get("/categories/{category}/articles")
+def list_articles_by_category(category: str):
+    sites = get_sites_by_category(category)
+    articles = []
+    for site in sites:
+        articles.extend(db.get_articles_by_site(site))
+    # Sort articles by publish_date descending
+    articles.sort(key=lambda a: a.publish_date, reverse=True)
+    return articles
 
-@app.post("/run/scrape")
-def run_scrape():
-    """Manually trigger a scrape of all sources."""
+@app.get("/articles/{category}/{site_name}")
+def list_articles_by_site(category: str, site_name: str):
+    return db.get_articles_by_site(site_name)
+
+@app.get("/today")
+def list_today_articles():
+    today = datetime.now().date()
+    return db.get_articles_after(datetime(today.year, today.month, today.day))
+
+@app.get("/today/minscore/{min_score}")
+def list_today_articles_by_score(min_score: int):
+    today = datetime.now().date()
+    return db.get_articles_by_score_after(min_score, datetime(today.year, today.month, today.day))
+
+@app.get("/scrape")
+def trigger_scrape():
     task_scrape_all()
-    return {"status": "ok"}
+    return {"message": "Scraping triggered"}
 
-
-@app.post("/run/score")
-async def run_score():
-    """Manually trigger scoring of all unscored articles."""
+@app.get("/score")
+async def trigger_score():
     await task_score_unscored()
-    return {"status": "ok"}
-
-
-@app.get("/jobs")
-def list_jobs():
-    """List all scheduled jobs and their next run times."""
-    return [
-        {"id": job.id, "next_run": str(job.next_run_time)}
-        for job in scheduler.get_jobs()
-    ]
+    return {"message": "Scoring triggered"}

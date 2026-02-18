@@ -1,7 +1,6 @@
 import newspaper
 from db import get_processed_urls, save_article
 from helper import extract_site_from
-from helper import dataArticle
 
 
 def scrape(site_name: str, url: str) -> None:
@@ -11,11 +10,7 @@ def scrape(site_name: str, url: str) -> None:
     """
 
     base_url = f"https://{extract_site_from(url)}"
-    source = newspaper.build(base_url)
-
-    #for debugging:
-    for article in source.articles:
-        print(article.url)
+    source = newspaper.build(base_url, memoize_articles=False)
 
     #Filtering
     filter = f"https://{url}"

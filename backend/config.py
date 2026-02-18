@@ -37,3 +37,24 @@ def get_language(name: str) -> str | None:
             if source["name"].lower() == name.lower():
                 return source.get("language")
     return None
+
+def get_category_by_name(name: str) -> str | None:
+    """Return the category name for the source matching the given name (case-insensitive)."""
+    config = _load_config()
+    for category in config.get("categories", []):
+        for source in category.get("sources", []):
+            if source["name"].lower() == name.lower():
+                return category.get("name")
+
+def get_categories() -> list[str]:
+    """Return a list of all category names."""
+    config = _load_config()
+    return [category.get("name") for category in config.get("categories", [])]
+
+def get_sites_by_category(category_name: str) -> list[str]:
+    """Return a list of site names for the given category name (case-insensitive)."""
+    config = _load_config()
+    for category in config.get("categories", []):
+        if category.get("name").lower() == category_name.lower():
+            return [source["name"] for source in category.get("sources", [])]
+    return []

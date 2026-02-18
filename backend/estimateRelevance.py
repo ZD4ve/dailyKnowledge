@@ -1,21 +1,25 @@
-from db import get_article_by_url, get_articles_by_url, set_score
+import asyncio
+from db import get_unscored_articles,set_score
+from helper import dataArticle
 from llmRelevance import async_estimate
 
 
 
-async def async_process_article(url: str) -> None:
-    """retrieve article with given url, estimate relevance, and store in db"""
-    article = get_article_by_url(url)
+async def async_process_articles() -> None:
+    """Retrieve unscored articles, estimate relevance concurrently, and store in db."""
+    articles = get_unscored_articles()
+    tasks = [_process(article) for article in articles]
+    await asyncio.gather(*tasks, return_exceptions=True)
+
+
+async def _process(article: dataArticle) -> None:
     if article is None:
-        raise ValueError(f"No article found in db with URL: {url}")
+        return
     if article.score != -1:
         return  # already scored
-    
     result = await async_estimate(article)
-    
     if result is None:
-        print(f"Failed to estimate relevance for URL: {url}")
+        print(f"Failed to estimate relevance for URL: {article.url}")
         return
-
     score, summary = result
-    set_score(url, score, summary)
+    set_score(article.url, score, summary)

@@ -57,6 +57,15 @@ def get_articles_by_url(search: str) -> list[dataArticle]:
         ).fetchall()
     return [dataArticle.from_row(row) for row in rows]
 
+def get_articles_by_site(site_name: str) -> list[dataArticle]:
+    """Retrieve all articles from a specific site."""
+    with _get_connection() as conn:
+        rows = conn.execute(
+            "SELECT * FROM articles WHERE site_name = ? ORDER BY created_at DESC",
+            (site_name,),
+        ).fetchall()
+    return [dataArticle.from_row(row) for row in rows]
+
 def get_article_by_url(url: str) -> dataArticle | None:
     """Retrieve a single article by its exact URL."""
     with _get_connection() as conn:
@@ -90,8 +99,17 @@ def get_articles_after(date: datetime) -> list[dataArticle]:
     """Return all articles created after the given datetime."""
     with _get_connection() as conn:
         rows = conn.execute(
-            "SELECT * FROM articles WHERE created_at >= ? ORDER BY created_at DESC",
+            "SELECT * FROM articles WHERE publish_date >= ? ORDER BY publish_date DESC",
             (date,),
+        ).fetchall()
+    return [dataArticle.from_row(row) for row in rows]
+
+def get_articles_by_score_after(score: int, date: datetime) -> list[dataArticle]:
+    """Return all articles with score >= min_score and publish_date >= date."""
+    with _get_connection() as conn:
+        rows = conn.execute(
+            "SELECT * FROM articles WHERE score >= ? AND publish_date >= ? ORDER BY publish_date DESC",
+            (score, date),
         ).fetchall()
     return [dataArticle.from_row(row) for row in rows]
 
