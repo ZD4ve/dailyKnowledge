@@ -1,6 +1,7 @@
 import newspaper
 from db import get_processed_urls, save_article
 from helper import extract_site_from
+from helper import dataArticle
 
 
 def scrape(site_name: str, url: str) -> None:

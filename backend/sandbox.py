@@ -1,9 +1,10 @@
 import asyncio
 from tqdm.asyncio import tqdm as atqdm
+from backend.helper import dataArticle
 from config import get_all_urls
 from scrapeSite import scrape
 from db import get_articles_by_url
-from estimateUsefullness import async_estimate, AsyncRateLimiter
+from llmRelevance import async_estimate, AsyncRateLimiter
 
 RATE_LIMIT = 15  # requests per minute
 
@@ -21,12 +22,12 @@ async def main():
     rate_limiter = AsyncRateLimiter(RATE_LIMIT)
 
     # 3. Fire off all tasks — rate limiter handles spacing
-    async def process(article: dict) -> tuple | None:
+    async def process(article: dataArticle) -> tuple | None:
         result = await async_estimate(article, rate_limiter)
         if result is None:
             return None
         score, summary = result
-        return score, summary, article["title"], article["url"]
+        return score, summary, article.title, article.url
 
     tasks = [process(a) for a in articles]
     results = []

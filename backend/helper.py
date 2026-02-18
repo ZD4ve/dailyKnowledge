@@ -1,4 +1,7 @@
+from datetime import datetime
+import sqlite3
 from urllib.parse import urlparse
+from dataclasses import dataclass
 
 def extract_site_from(url: str) -> str:
     """
@@ -16,3 +19,21 @@ def extract_site_from(url: str) -> str:
     if len(parts) >= 2:
         return '.'.join(parts[-2:])
     return url
+
+
+@dataclass
+class dataArticle:
+    id: int
+    site_name: str
+    url: str
+    title: str
+    text: str
+    authors: str | None
+    publish_date: datetime
+    score: int
+    summary: str | None
+    created_at: str
+
+    @classmethod
+    def from_row(cls, row: sqlite3.Row) -> "dataArticle":
+        return cls(**dict(row))

@@ -2,3 +2,6 @@ newspaper4k[all]
 pyyaml
 openai
 python-dotenv
+fastapi
+uvicorn[standard]
+apscheduler
