@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from contextlib import asynccontextmanager
 
@@ -14,6 +14,7 @@ from scrapeSite import scrape
 import config
 
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
 
@@ -37,17 +38,15 @@ async def task_score_unscored() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Scrape every 10 minutes
     scheduler.add_job(
         task_scrape_all,
-        IntervalTrigger(minutes=10),
+        IntervalTrigger(minutes=30, start_date=datetime.now()+timedelta(minutes=1)),
         id="scrape",
         replace_existing=True,
     )
-    # Score unscored articles every 10 minutes (offset slightly)
     scheduler.add_job(
         task_score_unscored,
-        IntervalTrigger(minutes=10, seconds=30),
+        IntervalTrigger(minutes=60, start_date=datetime.now()+timedelta(minutes=11)),
         id="score",
         replace_existing=True,
     )
