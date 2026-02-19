@@ -13,6 +13,6 @@ categories:
   - name: "Pénzügy"
     sources:
       - name: "Financial Times"
-        url: "www.ft.com"
+        url: "ft.com"
         preference: "Pénzügyi hírek, globális gazdasági fejlemények"
         language: "English"

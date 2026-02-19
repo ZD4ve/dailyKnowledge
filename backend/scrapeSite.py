@@ -13,11 +13,12 @@ def scrape(site_name: str, url: str) -> None:
     source = newspaper.build(base_url, memorize_articles=False, number_threads=4)
 
     #Filtering
-    filter = f"https://{url}"
+    filter1 = f"https://{url}"
+    filter2 = f"https://www.{url}"
     processed = set(get_processed_urls(url))
     articles_to_download = [
         article for article in source.articles
-        if article.url.startswith(filter)
+        if (article.url.startswith(filter1) or article.url.startswith(filter2))
         and article.url not in processed
     ]
     if not articles_to_download:
