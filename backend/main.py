@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from config import get_all_urls, get_sites_by_category
 import db 
@@ -59,21 +60,30 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
+
 
 # --- API endpoints ---
 
-@app.get("/articles")
+""" @app.get("/articles")
 def list_articles():
     return db.get_all_articles()
+ """
 
 @app.get("/categories")
 def list_categories():
     return config.get_categories()
 
+""" 
 @app.get("/categories/{category}")
 def list_sites_by_category(category: str):
     return get_sites_by_category(category)
-
+""" 
 @app.get("/categories/{category}/articles")
 def list_articles_by_category(category: str):
     sites = get_sites_by_category(category)
@@ -82,7 +92,9 @@ def list_articles_by_category(category: str):
         articles.extend(db.get_articles_by_site(site))
     # Sort articles by publish_date descending
     articles.sort(key=lambda a: a.publish_date, reverse=True)
-    return articles
+    return articles 
+
+"""
 
 @app.get("/articles/{category}/{site_name}")
 def list_articles_by_site(category: str, site_name: str):
@@ -106,4 +118,4 @@ def trigger_scrape():
 @app.get("/score")
 async def trigger_score():
     await task_score_unscored()
-    return {"message": "Scoring triggered"}
+    return {"message": "Scoring triggered"} """
