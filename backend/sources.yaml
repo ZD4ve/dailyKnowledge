@@ -1,5 +1,5 @@
 categories:
-  - name: "Magyar Hírek és Elemzések"
+  - name: "Magyar"
     sources:
       - name: "Telex"
         url: "telex.hu"
@@ -27,7 +27,7 @@ categories:
         language: "Hungarian"
 
 
-  - name: "Világgazdaság és Befektetés"
+  - name: "Gazdaság"
     sources:
       - name: "Financial Times"
         url: "ft.com"
@@ -47,7 +47,8 @@ categories:
   - name: "Geopolitika"
     sources:
       - name: "AP News"
-        url: "apnews.com/hub/world-news"
+        #/hub/world-news
+        url: "apnews.com"
         preference: "Filter for major geopolitical events: conflicts, revolutions, elections, and natural disasters with global impact. Ignore minor local crime stories, US domestic entertainment, or sports. Focus on the 'what happened' in international relations."
         language: "English"
 

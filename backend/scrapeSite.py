@@ -10,7 +10,7 @@ def scrape(site_name: str, url: str) -> None:
     """
 
     base_url = f"https://{extract_site_from(url)}"
-    source = newspaper.build(base_url, memorize_articles=False, number_threads=4)
+    source = newspaper.build(base_url, memorize_articles=True, number_threads=4)
 
     #Filtering
     filter1 = f"https://{url}"
