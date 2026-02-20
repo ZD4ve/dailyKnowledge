@@ -26,13 +26,21 @@ function getDomain(url: string): string {
   }
 }
 
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+function formatTime(iso: string): string | null {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) {
+    return null
+  }
+  if (date.getHours() === 0 && date.getMinutes() === 0) {
+    return null
+  }
+  return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
 }
 
 export default function ArticleCard({ article }: Props) {
   const { label, cls } = scoreBadge(article.score)
   const domain = getDomain(article.url)
+  const timeLabel = formatTime(article.publish_date)
   const faviconUrl = domain
     ? `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
     : null
@@ -63,14 +71,18 @@ export default function ArticleCard({ article }: Props) {
         <span className="text-xs text-gray-400 dark:text-gray-500 font-medium truncate">
           {article.site_name}
         </span>
-        <span className="text-xs text-gray-300 dark:text-gray-600">·</span>
-        <span className="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">
-          {formatTime(article.publish_date)}
-        </span>
+        {timeLabel && (
+          <>
+            <span className="text-xs text-gray-300 dark:text-gray-600">·</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">
+              {timeLabel}
+            </span>
+          </>
+        )}
       </div>
 
       {/* Title */}
-      <h2 className="text-sm font-semibold leading-snug text-gray-900 dark:text-gray-100 line-clamp-2 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+      <h2 className="text-sm font-semibold leading-snug text-gray-900 dark:text-gray-100 line-clamp-3 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
         {article.title}
       </h2>
 

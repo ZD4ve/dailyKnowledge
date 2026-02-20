@@ -14,6 +14,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 10s
 
   # ── FastAPI backend ────────────────────────────────────────────────────────
   backend:
@@ -25,7 +26,7 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-dailyknowledge}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dailyknowledge}
-      OPENAI_API_BASE_URL: ${OPENAI_API_BASE_URL:?OPENAI_API_BASE_URL is required}
+      OPENAI_API_BASE: ${OPENAI_API_BASE:?OPENAI_API_BASE is required}
       OPENAI_MODEL: ${OPENAI_MODEL:?OPENAI_MODEL is required}
       OPENAI_API_KEY: ${OPENAI_API_KEY:?OPENAI_API_KEY is required}
       OPENAI_RATE_LIMIT: ${OPENAI_RATE_LIMIT:-10}

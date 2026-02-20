@@ -10,7 +10,6 @@ import os
 import sqlite3
 from contextlib import contextmanager
 from datetime import datetime
-from typing import Any
 
 from helper import dataArticle
 
@@ -164,10 +163,11 @@ def get_articles_by_url(search: str) -> list[dataArticle]:
     """Retrieve all articles whose URL contains the given string."""
     p = _ph()
     with _get_cursor() as cur:
-        rows = cur.execute(
+        cur.execute(
             f"SELECT * FROM articles WHERE url LIKE {p} ORDER BY created_at DESC",
             (f"%{search}%",),
-        ).fetchall() # pyright: ignore[reportOptionalMemberAccess]
+        )
+        rows = cur.fetchall()
     return [dataArticle.from_row(row) for row in rows]
 
 
@@ -175,10 +175,11 @@ def get_articles_by_site(site_name: str) -> list[dataArticle]:
     """Retrieve all articles from a specific site."""
     p = _ph()
     with _get_cursor() as cur:
-        rows = cur.execute(
+        cur.execute(
             f"SELECT * FROM articles WHERE site_name = {p} ORDER BY created_at DESC",
             (site_name,),
-        ).fetchall() # pyright: ignore[reportOptionalMemberAccess]
+        )
+        rows = cur.fetchall()
     return [dataArticle.from_row(row) for row in rows]
 
 
@@ -186,10 +187,11 @@ def get_article_by_url(url: str) -> dataArticle | None:
     """Retrieve a single article by its exact URL."""
     p = _ph()
     with _get_cursor() as cur:
-        row = cur.execute(
+        cur.execute(
             f"SELECT * FROM articles WHERE url = {p}",
             (url,),
-        ).fetchone() # pyright: ignore[reportOptionalMemberAccess]
+        )
+        row = cur.fetchone()
     return dataArticle.from_row(row) if row else None
 
 
@@ -197,19 +199,21 @@ def get_processed_urls(search: str) -> set[str]:
     """Return the set of already-saved article URLs that contain the given string."""
     p = _ph()
     with _get_cursor() as cur:
-        rows = cur.execute(
+        cur.execute(
             f"SELECT url FROM articles WHERE url LIKE {p}",
             (f"%{search}%",),
-        ).fetchall() # pyright: ignore[reportOptionalMemberAccess]
+        )
+        rows = cur.fetchall()
     return {row["url"] for row in rows}
 
 
 def get_all_articles() -> list[dataArticle]:
     """Return all articles ordered by creation date descending."""
     with _get_cursor() as cur:
-        rows = cur.execute(
+        cur.execute(
             "SELECT * FROM articles ORDER BY created_at DESC"
-        ).fetchall() # pyright: ignore[reportOptionalMemberAccess]
+        )
+        rows = cur.fetchall()
     return [dataArticle.from_row(row) for row in rows]
 
 
@@ -217,10 +221,11 @@ def get_articles_after(date: datetime) -> list[dataArticle]:
     """Return all articles created after the given datetime."""
     p = _ph()
     with _get_cursor() as cur:
-        rows = cur.execute(
+        cur.execute(
             f"SELECT * FROM articles WHERE publish_date >= {p} ORDER BY publish_date DESC",
             (date,),
-        ).fetchall() # pyright: ignore[reportOptionalMemberAccess]
+        )
+        rows = cur.fetchall()
     return [dataArticle.from_row(row) for row in rows]
 
 
@@ -228,19 +233,21 @@ def get_articles_by_score_after(score: int, date: datetime) -> list[dataArticle]
     """Return all articles with score >= min_score and publish_date >= date."""
     p = _ph()
     with _get_cursor() as cur:
-        rows = cur.execute(
+        cur.execute(
             f"SELECT * FROM articles WHERE score >= {p} AND publish_date >= {p} ORDER BY publish_date DESC",
             (score, date),
-        ).fetchall() # pyright: ignore[reportOptionalMemberAccess]
+        )
+        rows = cur.fetchall()
     return [dataArticle.from_row(row) for row in rows]
 
 
 def get_unscored_articles() -> list[dataArticle]:
     """Return all articles that have not been scored yet (score = -1)."""
     with _get_cursor() as cur:
-        rows = cur.execute(
+        cur.execute(
             "SELECT * FROM articles WHERE score = -1 ORDER BY created_at DESC"
-        ).fetchall() # pyright: ignore[reportOptionalMemberAccess]
+        )
+        rows = cur.fetchall()
     return [dataArticle.from_row(row) for row in rows]
 
 
