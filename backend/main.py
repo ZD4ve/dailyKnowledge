@@ -42,13 +42,13 @@ async def task_score_unscored() -> None:
 async def lifespan(app: FastAPI):
     scheduler.add_job(
         task_scrape_all,
-        IntervalTrigger(minutes=30, start_date=datetime.now()+timedelta(minutes=1)),
+        IntervalTrigger(minutes=60, start_date=datetime.now()+timedelta(minutes=1)),
         id="scrape",
         replace_existing=True,
     )
     scheduler.add_job(
         task_score_unscored,
-        IntervalTrigger(minutes=60, start_date=datetime.now()+timedelta(minutes=16)),
+        IntervalTrigger(minutes=60, start_date=datetime.now()+timedelta(minutes=31)),
         id="score",
         replace_existing=True,
     )
