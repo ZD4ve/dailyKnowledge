@@ -33,7 +33,7 @@ services:
       # Comma-separated list of allowed frontend origins
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
     ports:
-      - "8000:8000"
+      - "5764:8000"
 
   # ── React / Vite frontend (served by nginx) ────────────────────────────────
   frontend:
@@ -42,7 +42,7 @@ services:
       args:
         # The browser needs to reach the backend directly.
         # Change this to your public domain/IP in production.
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:5764}
     restart: unless-stopped
     depends_on:
       - backend
