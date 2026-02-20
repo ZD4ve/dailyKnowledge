@@ -1,18 +1,57 @@
 categories:
-  - name: "Magyar"
+  - name: "Magyar Hírek és Elemzések"
     sources:
       - name: "Telex"
-        url: "telex.hu/belfold/"
-        preference: "Belpolitika, Fontosabb országos hírek"
-        language: "Hungarian"
-      - name: "Index"
-        url: "index.hu/belfold/"
-        preference: "Belpolitika, Fontosabb országos hírek"
+        url: "telex.hu"
+        preference: "Keresd a fajsúlyos belföldi politikai, gazdasági és társadalmi híreket. Hagyd figyelmen kívül a bulvárt, a baleseteket, a sporthíreket és a lényegtelen 'kis színes' cikkeket. Fókuszálj a tényalapú beszámolókra, törvényhozásra és a korrupciógyanús ügyekre."
         language: "Hungarian"
 
-  - name: "Pénzügy"
+      - name: "Index"
+        url: "index.hu"
+        preference: "Kizárólag a nap legfontosabb országos híreire koncentrálj. Szűrd ki agresszíven a hatásvadász címeket, a celebhíreket és a véleményvezérelt töltelékcikkeket. Csak a 'hard news' (tények, bejelentések, események) érdekel."
+        language: "Hungarian"
+
+      - name: "Válasz Online"
+        url: "valaszonline.hu"
+        preference: "Emeld ki a mélyelemzéseket, oknyomozó riportokat és a magyar társadalom állapotáról szóló hosszú írásokat. A napi hírek nem relevánsak, csak a 'big picture' összefüggések."
+        language: "Hungarian"
+
+      - name: "Mandiner"
+        url: "mandiner.hu"
+        preference: "Keresd a fajsúlyosabb véleménycikkeket és vitákat, amelyek a kormányzati oldal ideológiai és stratégiai gondolkodását tükrözik. Hanyagold a rövid, napi sárdobálást és a provokatív rövidhíreket."
+        language: "Hungarian"
+
+      - name: "24.hu"
+        url: "24.hu"
+        preference: "Kizárólag a fajsúlyos belpolitikai, gazdasági és közéleti híreket, valamint a tényfeltáró anyagokat listázd. A hatásvadász címeket (clickbait) csak akkor dolgozd fel, ha érdemi, országos jelentőségű információ van mögöttük."
+        language: "Hungarian"
+
+
+  - name: "Világgazdaság és Befektetés"
     sources:
       - name: "Financial Times"
         url: "ft.com"
-        preference: "Pénzügyi hírek, globális gazdasági fejlemények"
+        preference: "Focus on macroeconomics, European markets, and EU policy decisions affecting businesses. Highlight articles related to the Technology and Defense sectors, as well as global ETF-moving news. Ignore lifestyle, arts, and pure opinion pieces unless they come from major economic thinkers."
+        language: "English"
+
+      - name: "Reuters Business"
+        url: "reuters.com/business"
+        preference: "Prioritize factual, market-moving news regarding US and Global markets. Look for central bank decisions (Fed, ECB), major M&A activity in tech/defense, and significant supply chain shifts. Strictly facts, no fluff."
+        language: "English"
+
+      - name: "The Economist"
+        url: "economist.com"
+        preference: "Extract insights on long-term global trends, macroeconomic shifts, and the intersection of geopolitics and business. Focus on 'The World This Week' summaries and major briefing articles that explain global economic cycles."
+        language: "English"
+
+  - name: "Geopolitika"
+    sources:
+      - name: "AP News"
+        url: "apnews.com/hub/world-news"
+        preference: "Filter for major geopolitical events: conflicts, revolutions, elections, and natural disasters with global impact. Ignore minor local crime stories, US domestic entertainment, or sports. Focus on the 'what happened' in international relations."
+        language: "English"
+
+      - name: "Al Jazeera English"
+        url: "aljazeera.com"
+        preference: "Look for geopolitical news and perspectives from the Global South, Middle East, and developing nations. Focus on conflicts, economic alliances, and humanitarian issues that are underreported in Western media. Avoid sports and minor local issues."
         language: "English"

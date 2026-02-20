@@ -41,23 +41,28 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number | null>(null)
+  const touchStartY = useRef<number | null>(null)
 
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
   }
 
   function handleTouchEnd(e: React.TouchEvent) {
-    if (touchStartX.current === null || categories.length < 2) return
-    const delta = e.changedTouches[0].clientX - touchStartX.current
+    if (touchStartX.current === null || touchStartY.current === null || categories.length < 2) return
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current
     touchStartX.current = null
-    if (Math.abs(delta) < 50) return   // ignore small movements
+    touchStartY.current = null
+    // ignore if mostly vertical or too small
+    if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY)) return
     const idx = categories.indexOf(activeCategory ?? '')
-    if (delta < 0) {
-      // swipe left → next category slides in from the right
+    if (deltaX < 0) {
+      // swipe left -> next category slides in from the right
       setSlideDir('left')
       setActiveCategory(categories[(idx + 1) % categories.length])
     } else {
-      // swipe right → previous category slides in from the left
+      // swipe right -> previous category slides in from the left
       setSlideDir('right')
       setActiveCategory(categories[(idx - 1 + categories.length) % categories.length])
     }
