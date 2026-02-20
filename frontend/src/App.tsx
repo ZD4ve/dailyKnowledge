@@ -100,7 +100,7 @@ function App() {
       <header className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 pt-4 pb-2 flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Daily Knowledge</h1>
+            <h1 className="text-2xl font-bold tracking-tight">dailyKnowledge</h1>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{dateStr}</p>
           </div>
 

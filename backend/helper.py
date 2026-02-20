@@ -1,5 +1,4 @@
 from datetime import datetime
-import sqlite3
 from urllib.parse import urlparse
 from dataclasses import dataclass
 
@@ -35,5 +34,5 @@ class dataArticle:
     created_at: str
 
     @classmethod
-    def from_row(cls, row: sqlite3.Row) -> "dataArticle":
-        return cls(**dict(row))
+    def from_row(cls, row: dict) -> "dataArticle":
+        return cls(**row)

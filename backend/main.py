@@ -1,4 +1,5 @@
 import asyncio
+import os
 from datetime import datetime, timedelta
 import logging
 from contextlib import asynccontextmanager
@@ -47,7 +48,7 @@ async def lifespan(app: FastAPI):
     )
     scheduler.add_job(
         task_score_unscored,
-        IntervalTrigger(minutes=60, start_date=datetime.now()+timedelta(minutes=11)),
+        IntervalTrigger(minutes=60, start_date=datetime.now()+timedelta(minutes=16)),
         id="score",
         replace_existing=True,
     )
@@ -60,9 +61,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+_cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=_cors_origins,
     allow_methods=["GET"],
     allow_headers=["*"],
 )

@@ -1,9 +1,10 @@
 import axios from 'axios'
 import type { Article } from './types'
 
-// Point this at your FastAPI backend
+// Point this at your FastAPI backend.
+// Override with VITE_API_URL at build time for production.
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8000',
 })
 
 /** Returns a list of category names, e.g. ["Magyar", "Pénzügy"] */
