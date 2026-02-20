@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import get_all_urls, get_sites_by_category
@@ -71,53 +71,21 @@ app.add_middleware(
 
 
 # --- API endpoints ---
+api_router = APIRouter(prefix="/api")
 
-""" @app.get("/articles")
-def list_articles():
-    return db.get_all_articles()
- """
-
-@app.get("/categories")
+@api_router.get("/categories")
 def list_categories():
     return config.get_categories()
 
-""" 
-@app.get("/categories/{category}")
-def list_sites_by_category(category: str):
-    return get_sites_by_category(category)
-""" 
-@app.get("/categories/{category}/articles")
+@api_router.get("/categories/{category}/articles")
 def list_articles_by_category(category: str):
     sites = get_sites_by_category(category)
     articles = []
     for site in sites:
         articles.extend(db.get_articles_by_site(site))
-    # Sort articles by publish_date descending
-    articles.sort(key=lambda a: a.publish_date, reverse=True)
+    articles.sort(key=lambda a: a.score, reverse=True)
     return articles 
 
-"""
 
-@app.get("/articles/{category}/{site_name}")
-def list_articles_by_site(category: str, site_name: str):
-    return db.get_articles_by_site(site_name)
 
-@app.get("/today")
-def list_today_articles():
-    today = datetime.now().date()
-    return db.get_articles_after(datetime(today.year, today.month, today.day))
-
-@app.get("/today/minscore/{min_score}")
-def list_today_articles_by_score(min_score: int):
-    today = datetime.now().date()
-    return db.get_articles_by_score_after(min_score, datetime(today.year, today.month, today.day))
-
-@app.get("/scrape")
-def trigger_scrape():
-    task_scrape_all()
-    return {"message": "Scraping triggered"}
-
-@app.get("/score")
-async def trigger_score():
-    await task_score_unscored()
-    return {"message": "Scoring triggered"} """
+app.include_router(api_router)

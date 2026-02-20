@@ -5,11 +5,15 @@ interface Props {
   category: string
   articles: Article[]
   sinceDate: Date
+  untilDate?: Date
 }
 
-export default function CategorySection({ articles, sinceDate }: Props) {
+export default function CategorySection({ articles, sinceDate, untilDate }: Props) {
   const filtered = articles
-    .filter((a) => new Date(a.publish_date) >= sinceDate)
+    .filter((a) => {
+      const d = new Date(a.publish_date)
+      return d >= sinceDate && (untilDate === undefined || d < untilDate)
+    })
     .sort((a, b) => {
       // Treat unscored (-1) as lowest priority
       const sa = a.score === -1 ? -Infinity : a.score

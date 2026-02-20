@@ -4,18 +4,28 @@ import type { Article } from './types'
 import CategorySection from './components/CategorySection'
 import { SkeletonGrid } from './components/SkeletonCard'
 
-type TimeRange = 'today' | '3days' | 'week'
+type TimeRange = 'today' | 'yesterday' | '3days' | 'week'
 
 function getSinceDate(range: TimeRange): Date {
   const d = new Date()
   if (range === 'today') d.setHours(0, 0, 0, 0)
+  else if (range === 'yesterday') { d.setDate(d.getDate() - 1); d.setHours(0, 0, 0, 0) }
   else if (range === '3days') { d.setDate(d.getDate() - 2); d.setHours(0, 0, 0, 0) }
   else { d.setDate(d.getDate() - 6); d.setHours(0, 0, 0, 0) }
   return d
 }
 
+// For 'yesterday' only: articles must be strictly before today
+function getUntilDate(range: TimeRange): Date | undefined {
+  if (range !== 'yesterday') return undefined
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  return d
+}
+
 const TIME_RANGE_LABELS: Record<TimeRange, string> = {
   today: 'Today',
+  yesterday: 'Yesterday',
   '3days': '3 Days',
   week: 'Week',
 }
@@ -193,6 +203,7 @@ function App() {
               category={activeCategory}
               articles={articlesByCategory[activeCategory]}
               sinceDate={getSinceDate(timeRange)}
+              untilDate={getUntilDate(timeRange)}
             />
           </div>
         )}
