@@ -2,7 +2,7 @@ import logging
 
 import newspaper
 from config import get_filter
-from db import get_processed_urls, save_article
+from db import get_stored_urls, save_article
 
 logger = logging.getLogger(__name__)
 
@@ -22,11 +22,11 @@ def scrape(site_name: str, url: str) -> None:
     #Filtering
     filter = set(get_filter(site_name) or [])
     filter.add(url)
-    processed = set(get_processed_urls(url))
+    stored = set(get_stored_urls(url))
     articles_to_download = [
         article for article in source.articles
         if any(keyword in article.url for keyword in filter)
-        and article.url not in processed
+        and article.url not in stored
     ]
     if not articles_to_download:
         return

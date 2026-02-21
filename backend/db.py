@@ -191,6 +191,18 @@ def get_unscored_articles() -> list[dataArticle]:
         rows = cur.fetchall()
     return [dataArticle.from_row(row) for row in rows]
 
+def get_stored_urls(search: str) -> set[str]:
+    """Return the set of already-saved article URLs that contain the given string."""
+    p = _ph()
+    with _get_cursor() as cur:
+        cur.execute(
+            f"SELECT url FROM articles WHERE url LIKE {p}",
+            (f"%{search}%",),
+        )
+        rows = cur.fetchall()
+    return {row["url"] for row in rows}
+
+
 # ---------------------------------------------------------------------------
 # Cleanup
 # ---------------------------------------------------------------------------
