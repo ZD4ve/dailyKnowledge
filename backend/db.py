@@ -182,65 +182,6 @@ def get_articles_by_site(site_name: str) -> list[dataArticle]:
         rows = cur.fetchall()
     return [dataArticle.from_row(row) for row in rows]
 
-
-def get_article_by_url(url: str) -> dataArticle | None:
-    """Retrieve a single article by its exact URL."""
-    p = _ph()
-    with _get_cursor() as cur:
-        cur.execute(
-            f"SELECT * FROM articles WHERE url = {p}",
-            (url,),
-        )
-        row = cur.fetchone()
-    return dataArticle.from_row(row) if row else None
-
-
-def get_processed_urls(search: str) -> set[str]:
-    """Return the set of already-saved article URLs that contain the given string."""
-    p = _ph()
-    with _get_cursor() as cur:
-        cur.execute(
-            f"SELECT url FROM articles WHERE url LIKE {p}",
-            (f"%{search}%",),
-        )
-        rows = cur.fetchall()
-    return {row["url"] for row in rows}
-
-
-def get_all_articles() -> list[dataArticle]:
-    """Return all articles ordered by creation date descending."""
-    with _get_cursor() as cur:
-        cur.execute(
-            "SELECT * FROM articles ORDER BY created_at DESC"
-        )
-        rows = cur.fetchall()
-    return [dataArticle.from_row(row) for row in rows]
-
-
-def get_articles_after(date: datetime) -> list[dataArticle]:
-    """Return all articles created after the given datetime."""
-    p = _ph()
-    with _get_cursor() as cur:
-        cur.execute(
-            f"SELECT * FROM articles WHERE publish_date >= {p} ORDER BY publish_date DESC",
-            (date,),
-        )
-        rows = cur.fetchall()
-    return [dataArticle.from_row(row) for row in rows]
-
-
-def get_articles_by_score_after(score: int, date: datetime) -> list[dataArticle]:
-    """Return all articles with score >= min_score and publish_date >= date."""
-    p = _ph()
-    with _get_cursor() as cur:
-        cur.execute(
-            f"SELECT * FROM articles WHERE score >= {p} AND publish_date >= {p} ORDER BY publish_date DESC",
-            (score, date),
-        )
-        rows = cur.fetchall()
-    return [dataArticle.from_row(row) for row in rows]
-
-
 def get_unscored_articles() -> list[dataArticle]:
     """Return all articles that have not been scored yet (score = -1)."""
     with _get_cursor() as cur:
@@ -249,6 +190,18 @@ def get_unscored_articles() -> list[dataArticle]:
         )
         rows = cur.fetchall()
     return [dataArticle.from_row(row) for row in rows]
+
+# ---------------------------------------------------------------------------
+# Cleanup
+# ---------------------------------------------------------------------------
+def delete_old(date: datetime) -> None:
+    """Delete all articles published or created before the given date."""
+    p = _ph()
+    with _get_cursor() as cur:
+        cur.execute(
+            f"DELETE FROM articles WHERE publish_date < {p} OR created_at < {p}",
+            (date, date),
+        )
 
 
 # Ensure the table exists on first import

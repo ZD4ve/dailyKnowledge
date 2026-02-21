@@ -23,11 +23,13 @@ scheduler = AsyncIOScheduler()
 
 # --- Background tasks ---
 
-def task_scrape_all() -> None:
+
+async def task_scrape_all() -> None:
     """Scrape all sources from config and save new articles to DB."""
+    tasks = []
     for name, url in get_all_urls():
-        logger.info(f"Scraping {name} ({url})")
-        scrape(name, url)
+        tasks.append(asyncio.to_thread(scrape, name, url))
+    await asyncio.gather(*tasks)
 
 
 async def task_score_unscored() -> None:
@@ -35,6 +37,10 @@ async def task_score_unscored() -> None:
     logger.info("Scoring unscored articles...")
     await async_process_articles()
 
+def task_cleanup_old() -> None:
+    """Delete articles older than 30 days."""
+    cutoff = datetime.now() - timedelta(days=30)
+    db.delete_old(cutoff)
 
 # --- FastAPI app ---
 
@@ -50,6 +56,13 @@ async def lifespan(app: FastAPI):
         task_score_unscored,
         IntervalTrigger(minutes=60, start_date=datetime.now()+timedelta(minutes=31)),
         id="score",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        task_cleanup_old,
+        trigger="cron",
+        hour=2,
+        id="cleanup",
         replace_existing=True,
     )
     scheduler.start()

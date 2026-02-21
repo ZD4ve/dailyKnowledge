@@ -1,24 +1,31 @@
-import newspaper
-from db import get_processed_urls, save_article
-from helper import extract_site_from
+import logging
 
+import newspaper
+from config import get_filter
+from db import get_processed_urls, save_article
+
+logger = logging.getLogger(__name__)
 
 def scrape(site_name: str, url: str) -> None:
     """
     Scrape articles from the given URL and save them to the database
     if not already processed. Uses Newspaper4k bulk download.
     """
+    logging.info(f"Scraping {site_name}...")
 
-    base_url = f"https://{extract_site_from(url)}"
-    source = newspaper.build(base_url, memorize_articles=True, number_threads=4)
+    try:
+        source = newspaper.build(url, memorize_articles=True, number_threads=4)
+    except Exception as e:
+        logger.error(f"Error building newspaper source for {url}: {e}")
+        return
 
     #Filtering
-    filter1 = f"https://{url}"
-    filter2 = f"https://www.{url}"
+    filter = set(get_filter(site_name) or [])
+    filter.add(url)
     processed = set(get_processed_urls(url))
     articles_to_download = [
         article for article in source.articles
-        if (article.url.startswith(filter1) or article.url.startswith(filter2))
+        if any(keyword in article.url for keyword in filter)
         and article.url not in processed
     ]
     if not articles_to_download:
@@ -26,8 +33,12 @@ def scrape(site_name: str, url: str) -> None:
     source.articles = articles_to_download
 
 
-    source.download_articles()
-    source.parse_articles()
+    try:
+        source.download_articles()
+        source.parse_articles()
+    except Exception as e:
+        logger.error(f"Error downloading/parsing articles from {url}: {e}")
+        return
 
 
     for article in source.articles:
@@ -41,3 +52,5 @@ def scrape(site_name: str, url: str) -> None:
             authors=article.authors,
             publish_date=article.publish_date,
         )
+    
+    logging.info(f"Finished scraping {site_name}. {len(source.articles)} articles downloaded.")

@@ -3,56 +3,67 @@ categories:
     sources:
       - name: "Telex"
         url: "telex.hu"
-        preference: "Keresd a fajsúlyos belföldi politikai, gazdasági és társadalmi híreket. Hagyd figyelmen kívül a bulvárt, a baleseteket, a sporthíreket és a lényegtelen 'kis színes' cikkeket. Fókuszálj a tényalapú beszámolókra, törvényhozásra és a korrupciógyanús ügyekre."
+        preference: "Kiemelt prioritás: Választási eredmények, közvélemény-kutatások, új törvények elfogadása, költségvetési és makrogazdasági adatok, miniszteri lemondások. Közepes prioritás: Parlamenti viták, pártok sajtótájékoztatói. Alacsony prioritás (ignoráld): Bűnügyek, balesetek, kis színes hírek, időjárás. KIVÉTEL: Csak akkor vegyél figyelembe bűnügyet, ha az kormányválságot okoz vagy súlyos korrupciót tár fel."
+        filter:
+          - "belfold"
+          - "defacto"
+          - "direkt36"
         language: "Hungarian"
+
 
       - name: "Index"
         url: "index.hu"
-        preference: "Kizárólag a nap legfontosabb országos híreire koncentrálj. Szűrd ki agresszíven a hatásvadász címeket, a celebhíreket és a véleményvezérelt töltelékcikkeket. Csak a 'hard news' (tények, bejelentések, események) érdekel."
+        preference: "Fókuszálj a 'Hard News' kategóriára: Törvényhozás, adóváltozások, sztrájkok, kritikus infrastruktúra leállása, diplomáciai konfliktusok. Csak azokat a híreket emeld ki, amelyek közvetlen hatással vannak az ország működésére vagy a gazdaságra. Kezeld alacsony prioritásként a hatásvadász címeket, ahol a tartalom csak spekuláció. A rendőrségi és tűzoltósági híreket (kék hírek) teljesen hagyd figyelmen kívül, kivéve terrorveszély esetén."
         language: "Hungarian"
+        filter:
+          - "belfold"
 
       - name: "Válasz Online"
         url: "valaszonline.hu"
-        preference: "Emeld ki a mélyelemzéseket, oknyomozó riportokat és a magyar társadalom állapotáról szóló hosszú írásokat. A napi hírek nem relevánsak, csak a 'big picture' összefüggések."
+        preference: "Legmagasabb prioritás: Átfogó elemzések az oktatás, egészségügy vagy demográfia helyzetéről, választókerületi esélylatolgatások adatokkal alátámasztva, mélyinterjúk döntéshozókkal. Alacsony prioritás: Rövidhírek, kulturális ajánlók, egyéni sorsokat bemutató riportok, amennyiben nem világítanak rá rendszerszintű hibákra."
         language: "Hungarian"
 
       - name: "Mandiner"
         url: "mandiner.hu"
-        preference: "Keresd a fajsúlyosabb véleménycikkeket és vitákat, amelyek a kormányzati oldal ideológiai és stratégiai gondolkodását tükrözik. Hanyagold a rövid, napi sárdobálást és a provokatív rövidhíreket."
+        preference: "Keresd a stratégiai tartalmat: A miniszterelnök és a kormánytagok iránymutató beszédei, a kormány hivatalos álláspontja EU-s vitákban, választási stratégia ismertetése. Hagyd figyelmen kívül az ellenzéki politikusok gúnyolását, a provokatív szemlézéseket és a napi politikai adok-kapokot. Csak az ideológiai és stratégiai elemzések érdekelnek."
         language: "Hungarian"
+        filter:
+          - "belfold"
 
       - name: "24.hu"
         url: "24.hu"
-        preference: "Kizárólag a fajsúlyos belpolitikai, gazdasági és közéleti híreket, valamint a tényfeltáró anyagokat listázd. A hatásvadász címeket (clickbait) csak akkor dolgozd fel, ha érdemi, országos jelentőségű információ van mögöttük."
+        preference: "Szigorú szűrés: Kizárólag akkor emeld ki a cikket, ha az oknyomozó újságírás eredménye (korrupció, visszaélés feltárása), választási csalásról szól, vagy jelentős gazdasági bejelentést tartalmaz. Minden más téma (baleset, celeb, napi daráló, véleménycikk) alacsony prioritású. A rendőrségi rovat hírei tiltólistásak."
         language: "Hungarian"
+        filter:
+          - "belfold"
 
 
   - name: "Gazdaság"
     sources:
       - name: "Financial Times"
         url: "ft.com"
-        preference: "Focus on macroeconomics, European markets, and EU policy decisions affecting businesses. Highlight articles related to the Technology and Defense sectors, as well as global ETF-moving news. Ignore lifestyle, arts, and pure opinion pieces unless they come from major economic thinkers."
+        preference: "High Priority: EU regulatory changes (antitrust, AI act, Green Deal), Defense sector funding and contracts, Tech sector earnings of major players, Central Bank rate decisions (ECB/Fed). Medium Priority: General market summaries. Low Priority (Ignore): Lifestyle, Arts, Opinion pieces by non-economists. Goal: Identify volatility triggers for an EU-based investor."
         language: "English"
 
       - name: "Reuters Business"
-        url: "reuters.com/business"
-        preference: "Prioritize factual, market-moving news regarding US and Global markets. Look for central bank decisions (Fed, ECB), major M&A activity in tech/defense, and significant supply chain shifts. Strictly facts, no fluff."
+        url: "reuters.com"
+        preference: "Top Priority Triggers: Mergers & Acquisitions deals in Tech/Defense, Supply chain disruptions (semiconductors, energy), Inflation data releases, sudden currency fluctuations (EUR/USD). Downrank: 'Analysis' pieces that merely summarize past events without forward-looking value. Strictly factual, market-moving news only."
         language: "English"
 
       - name: "The Economist"
         url: "economist.com"
-        preference: "Extract insights on long-term global trends, macroeconomic shifts, and the intersection of geopolitics and business. Focus on 'The World This Week' summaries and major briefing articles that explain global economic cycles."
+        preference: "High Priority: Articles discussing long-term shifts in Global Trade (de-globalization), Geopolitical impacts on supply chains, and major elections in G20 countries. Focus on the 'Leaders' and 'Briefing' sections. Ignore: Book reviews, localized cultural stories, and minor country politics unless it affects the global economy."
         language: "English"
+
 
   - name: "Geopolitika"
     sources:
       - name: "AP News"
-        #/hub/world-news
         url: "apnews.com"
-        preference: "Filter for major geopolitical events: conflicts, revolutions, elections, and natural disasters with global impact. Ignore minor local crime stories, US domestic entertainment, or sports. Focus on the 'what happened' in international relations."
+        preference: "Critical Importance: Declaration of war, signing of peace treaties or alliances, coup d'états, results of national elections in major powers, natural disasters with global infrastructure impact. Low Importance: Local crime stories anywhere in the world, human interest stories, minor diplomatic spats. Focus strictly on border-altering or regime-changing events."
         language: "English"
 
       - name: "Al Jazeera English"
         url: "aljazeera.com"
-        preference: "Look for geopolitical news and perspectives from the Global South, Middle East, and developing nations. Focus on conflicts, economic alliances, and humanitarian issues that are underreported in Western media. Avoid sports and minor local issues."
+        preference: "High Priority: Conflicts in the Middle East and Global South involving major powers, resource wars (oil, lithium, water), significant protests threatening regime stability. Low Priority: Sports, localized community news, op-eds without factual basis. Goal: Understand non-Western perspectives on major global conflicts."
         language: "English"

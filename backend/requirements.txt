@@ -1,4 +1,4 @@
-newspaper4k[all]
+newspaper4k[all] @ git+https://github.com/ZD4ve/newspaper4k.git
 pyyaml
 openai
 python-dotenv

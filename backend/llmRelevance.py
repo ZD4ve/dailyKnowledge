@@ -1,7 +1,7 @@
 import os
 import asyncio
 import json
-from openai import OpenAI, AsyncOpenAI
+from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
@@ -19,11 +19,7 @@ RATE_LIMIT: int = int(os.getenv("OPENAI_RATE_LIMIT", "10")) # pyright: ignore[re
 if BASE_URL is None or MODEL is None or API_KEY is None:
     raise ValueError("Missing required environment variables (OPENAI_API_BASE, OPENAI_MODEL, OPENAI_API_KEY). Please check your .env file or environment configuration.")
 
-client = OpenAI(
-    base_url=BASE_URL,
-    api_key=API_KEY,
-)
-async_client = AsyncOpenAI(
+client = AsyncOpenAI(
     base_url=BASE_URL,
     api_key=API_KEY,
 )
@@ -122,7 +118,7 @@ async def async_estimate(
 
     await rate_limiter.acquire()
 
-    response = await async_client.chat.completions.create(
+    response = await client.chat.completions.create(
         model=MODEL,
         messages=messages,
         response_format={

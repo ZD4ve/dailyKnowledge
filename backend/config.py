@@ -9,6 +9,7 @@ def _load_config() -> dict:
         return yaml.safe_load(f)
 
 
+
 def get_all_urls() -> list[tuple[str, str]]:
     """Return a flat list of (name, url) tuples from every category."""
     config = _load_config()
@@ -17,7 +18,6 @@ def get_all_urls() -> list[tuple[str, str]]:
         for category in config.get("categories", [])
         for source in category.get("sources", [])
     ]
-
 
 def get_preference(name: str) -> str | None:
     """Return the preference string for the source matching the given name (case-insensitive)."""
@@ -28,7 +28,6 @@ def get_preference(name: str) -> str | None:
                 return source.get("preference")
     return None
 
-
 def get_language(name: str) -> str | None:
     """Return the language for the source matching the given name (case-insensitive)."""
     config = _load_config()
@@ -37,14 +36,6 @@ def get_language(name: str) -> str | None:
             if source["name"].lower() == name.lower():
                 return source.get("language")
     return None
-
-def get_category_by_name(name: str) -> str | None:
-    """Return the category name for the source matching the given name (case-insensitive)."""
-    config = _load_config()
-    for category in config.get("categories", []):
-        for source in category.get("sources", []):
-            if source["name"].lower() == name.lower():
-                return category.get("name")
 
 def get_categories() -> list[str]:
     """Return a list of all category names."""
@@ -58,3 +49,12 @@ def get_sites_by_category(category_name: str) -> list[str]:
         if category.get("name").lower() == category_name.lower():
             return [source["name"] for source in category.get("sources", [])]
     return []
+
+def get_filter(name: str) -> list[str] | None:
+    """Return the filter list for the source matching the given name (case-insensitive)."""
+    config = _load_config()
+    for category in config.get("categories", []):
+        for source in category.get("sources", []):
+            if source["name"].lower() == name.lower():
+                return source.get("filter", [])
+    return None
