@@ -1,6 +1,14 @@
 import type { Article } from '../types'
 import ArticleCard from './ArticleCard'
 
+// Deterministic hash of an integer — used as a stable tiebreaker within same-score articles.
+// Same ID always produces the same value, so order never changes on reload.
+function hashId(id: number): number {
+  let h = id ^ (id >>> 16)
+  h = Math.imul(h, 0x45d9f3b)
+  return h ^ (h >>> 16)
+}
+
 interface Props {
   category: string
   articles: Article[]
@@ -18,7 +26,9 @@ export default function CategorySection({ articles, sinceDate, untilDate }: Prop
       // Treat unscored (-1) as lowest priority
       const sa = a.score === -1 ? -Infinity : a.score
       const sb = b.score === -1 ? -Infinity : b.score
-      return sb - sa
+      if (sb !== sa) return sb - sa
+      // Same score: stable pseudo-random order based on article ID
+      return hashId(a.id) - hashId(b.id)
     })
 
   if (filtered.length === 0) {
