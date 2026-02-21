@@ -217,7 +217,9 @@ def get_articles_by_sites_paginated(
     where_sql = " AND ".join(where_clauses)
     # Tiebreaker: Knuth multiplicative hash spreads sequential IDs far apart,
     # giving a stable pseudo-random shuffle within the same score group.
-    order_sql = f"ORDER BY CASE WHEN score = -1 THEN 1 ELSE 0 END ASC, score DESC, (id * 2654435761 + {_SHUFFLE_SEED}) % 999983"
+    # psycopg2 treats bare % as a placeholder, so escape it as %% for Postgres.
+    mod_op = "%%" if _is_postgres() else "%"
+    order_sql = f"ORDER BY CASE WHEN score = -1 THEN 1 ELSE 0 END ASC, score DESC, (id * 2654435761 + {_SHUFFLE_SEED}) {mod_op} 999983"
 
     count_sql = f"SELECT COUNT(*) AS cnt FROM articles WHERE {where_sql}"
     data_sql = (
