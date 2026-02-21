@@ -14,7 +14,7 @@ def scrape(site_name: str, url: str) -> None:
     logging.info(f"Scraping {site_name}...")
 
     try:
-        source = newspaper.build(url, memorize_articles=True, number_threads=4)
+        source = newspaper.build("https://"+url, memorize_articles=True, number_threads=4)
     except Exception as e:
         logger.error(f"Error building newspaper source for {url}: {e}")
         return
