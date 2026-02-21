@@ -58,3 +58,12 @@ def get_filter(name: str) -> list[str] | None:
             if source["name"].lower() == name.lower():
                 return source.get("filter", [])
     return None
+
+def get_rss(name: str) -> list[str] | None:
+    """Return the RSS feed URL list for the source matching the given name (case-insensitive)."""
+    config = _load_config()
+    for category in config.get("categories", []):
+        for source in category.get("sources", []):
+            if source["name"].lower() == name.lower():
+                return source.get("rss", [])
+    return None
