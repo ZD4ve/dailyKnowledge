@@ -91,14 +91,15 @@ def list_categories():
     return config.get_categories()
 
 @api_router.get("/categories/{category}/articles")
-def list_articles_by_category(category: str):
+def list_articles_by_category(
+    category: str,
+    since: str | None = None,   # ISO datetime
+    until: str | None = None,   # ISO datetime
+    limit: int = 1000,
+    offset: int = 0,
+):
     sites = get_sites_by_category(category)
-    articles = []
-    for site in sites:
-        articles.extend(db.get_articles_by_site(site))
-    articles.sort(key=lambda a: a.score, reverse=True)
-    return articles 
-
-
+    articles, total = db.get_articles_by_sites_paginated(sites, since, until, limit, offset)
+    return {"articles": articles, "total": total}
 
 app.include_router(api_router)

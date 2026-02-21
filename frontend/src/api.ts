@@ -13,17 +13,27 @@ export async function getCategories(): Promise<string[]> {
   return res.data
 }
 
+export interface PaginatedResponse {
+  articles: Article[]
+  total: number
+}
+
 /**
- * Returns all articles for a category, sorted by publish_date descending.
- * The frontend further filters and re-sorts by score.
+ * Returns a page of articles for a category, sorted by score descending.
+ * Supports server-side date filtering and pagination.
  *
  * Backend endpoint needed:
- *   GET /categories/{category}/articles
- *   → list[dataArticle]  sorted by publish_date desc
- *
- * This endpoint already exists in the current backend.
+ *   GET /api/categories/{category}/articles?since=ISO&until=ISO&limit=N&offset=N
+ *   → { articles: list[dataArticle], total: int }
+ *   Articles sorted by score DESC (unscored at end), then by id hash for stable order.
  */
-export async function getCategoryArticles(category: string): Promise<Article[]> {
-  const res = await api.get<Article[]>(`/api/categories/${encodeURIComponent(category)}/articles`)
+export async function getCategoryArticles(
+  category: string,
+  params?: { since?: string; until?: string; limit?: number; offset?: number },
+): Promise<PaginatedResponse> {
+  const res = await api.get<PaginatedResponse>(
+    `/api/categories/${encodeURIComponent(category)}/articles`,
+    { params },
+  )
   return res.data
 }

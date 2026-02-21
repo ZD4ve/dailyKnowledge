@@ -182,6 +182,60 @@ def get_articles_by_site(site_name: str) -> list[dataArticle]:
         rows = cur.fetchall()
     return [dataArticle.from_row(row) for row in rows]
 
+_SHUFFLE_SEED = 42
+
+def get_articles_by_sites_paginated(
+    site_names: list[str],
+    since: str | None,
+    until: str | None,
+    limit: int,
+    offset: int,
+) -> tuple[list[dataArticle], int]:
+    """Retrieve paginated articles for a list of sites with optional date filters.
+
+    Scored articles (score != -1) are returned first, ordered by score DESC.
+    Articles with the same score are ordered pseudo-randomly using _SHUFFLE_SEED
+    as a tiebreaker, giving a stable non-ID-order shuffle.
+    Unscored articles (score = -1) appear last.
+    Returns a (articles, total) tuple where total is the count before pagination.
+    """
+    if not site_names:
+        return [], 0
+
+    p = _ph()
+    in_placeholders = ", ".join(p for _ in site_names)
+    params: list = list(site_names)
+
+    where_clauses = [f"site_name IN ({in_placeholders})"]
+    if since:
+        where_clauses.append(f"publish_date >= {p}")
+        params.append(since)
+    if until:
+        where_clauses.append(f"publish_date < {p}")
+        params.append(until)
+
+    where_sql = " AND ".join(where_clauses)
+    # Tiebreaker: Knuth multiplicative hash spreads sequential IDs far apart,
+    # giving a stable pseudo-random shuffle within the same score group.
+    order_sql = f"ORDER BY CASE WHEN score = -1 THEN 1 ELSE 0 END ASC, score DESC, (id * 2654435761 + {_SHUFFLE_SEED}) % 999983"
+
+    count_sql = f"SELECT COUNT(*) AS cnt FROM articles WHERE {where_sql}"
+    data_sql = (
+        f"SELECT * FROM articles WHERE {where_sql} "
+        f"{order_sql} LIMIT {p} OFFSET {p}"
+    )
+
+    with _get_cursor() as cur:
+        cur.execute(count_sql, tuple(params))
+        count_row = cur.fetchone()
+        total = count_row["cnt"] if count_row else 0
+
+        cur.execute(data_sql, tuple(params + [limit, offset]))
+        rows = cur.fetchall()
+
+    return [dataArticle.from_row(row) for row in rows], total
+
+
 def get_unscored_articles() -> list[dataArticle]:
     """Return all articles that have not been scored yet (score = -1)."""
     with _get_cursor() as cur:

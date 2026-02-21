@@ -1,26 +1,45 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { getCategories, getCategoryArticles } from './api'
 import type { Article } from './types'
 import CategorySection from './components/CategorySection'
 import { SkeletonGrid } from './components/SkeletonCard'
 
+const PAGE_SIZE = 20
+
 type TimeRange = 'today' | 'yesterday' | '3days' | 'week'
 
-function getSinceDate(range: TimeRange): Date {
+function getSinceDate(range: TimeRange): string {
   const d = new Date()
   if (range === 'today') d.setHours(0, 0, 0, 0)
   else if (range === 'yesterday') { d.setDate(d.getDate() - 1); d.setHours(0, 0, 0, 0) }
   else if (range === '3days') { d.setDate(d.getDate() - 2); d.setHours(0, 0, 0, 0) }
   else { d.setDate(d.getDate() - 6); d.setHours(0, 0, 0, 0) }
-  return d
+  return d.toISOString()
 }
 
 // For 'yesterday' only: articles must be strictly before today
-function getUntilDate(range: TimeRange): Date | undefined {
+function getUntilDate(range: TimeRange): string | undefined {
   if (range !== 'yesterday') return undefined
   const d = new Date()
   d.setHours(0, 0, 0, 0)
-  return d
+  return d.toISOString()
+}
+
+// Deterministic hash used as a stable tiebreaker for same-score articles
+function hashId(id: number): number {
+  let h = id ^ (id >>> 16)
+  h = Math.imul(h, 0x45d9f3b)
+  return h ^ (h >>> 16)
+}
+
+// Sort articles by score DESC (unscored last), with hash tiebreaker within same score
+function sortArticles(articles: Article[]): Article[] {
+  return [...articles].sort((a, b) => {
+    const sa = a.score === -1 ? -Infinity : a.score
+    const sb = b.score === -1 ? -Infinity : b.score
+    if (sb !== sa) return sb - sa
+    return hashId(a.id) - hashId(b.id)
+  })
 }
 
 const TIME_RANGE_LABELS: Record<TimeRange, string> = {
@@ -32,16 +51,20 @@ const TIME_RANGE_LABELS: Record<TimeRange, string> = {
 
 function App() {
   const [categories, setCategories] = useState<string[]>([])
-  const [articlesByCategory, setArticlesByCategory] = useState<Record<string, Article[]>>({})
+  const [articles, setArticles] = useState<Article[]>([])
+  const [totalArticles, setTotalArticles] = useState(0)
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [timeRange, setTimeRange] = useState<TimeRange>('today')
   const [slideDir, setSlideDir] = useState<'left' | 'right'>('left')
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true)          // initial category load
+  const [loadingArticles, setLoadingArticles] = useState(false) // article page load
   const [error, setError] = useState<string | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number | null>(null)
   const touchStartY = useRef<number | null>(null)
+  // Track the current fetch to cancel stale requests
+  const fetchId = useRef(0)
 
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX
@@ -79,28 +102,84 @@ function App() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Load categories on mount
   useEffect(() => {
-    async function load() {
+    async function loadCategories() {
       try {
         const cats = await getCategories()
         setCategories(cats)
         setActiveCategory(cats[0] ?? null)
-
-        const entries = await Promise.all(
-          cats.map(async (cat) => {
-            const articles = await getCategoryArticles(cat)
-            return [cat, articles] as const
-          })
-        )
-        setArticlesByCategory(Object.fromEntries(entries))
       } catch {
         setError('Could not connect to the API. Is the backend running?')
       } finally {
         setLoading(false)
       }
     }
-    load()
+    loadCategories()
   }, [])
+
+  // Fetch a page of articles; returns false if the fetch was stale
+  const fetchPage = useCallback(
+    async (category: string, range: TimeRange, offset: number, currentFetchId: number) => {
+      const since = getSinceDate(range)
+      const until = getUntilDate(range)
+      const res = await getCategoryArticles(category, {
+        since,
+        until,
+        limit: PAGE_SIZE,
+        offset,
+      })
+      // If a newer fetch was started, discard these results
+      if (fetchId.current !== currentFetchId) return false
+      return res
+    },
+    [],
+  )
+
+  // Reset articles when category or time range changes and load first page
+  useEffect(() => {
+    if (!activeCategory) return
+
+    const id = ++fetchId.current
+    setArticles([])
+    setTotalArticles(0)
+    setLoadingArticles(true)
+    setError(null)
+
+    fetchPage(activeCategory, timeRange, 0, id)
+      .then((res) => {
+        if (!res) return // stale
+        setArticles(sortArticles(res.articles))
+        setTotalArticles(res.total)
+      })
+      .catch(() => {
+        if (fetchId.current !== id) return
+        setError('Failed to load articles.')
+      })
+      .finally(() => {
+        if (fetchId.current === id) setLoadingArticles(false)
+      })
+  }, [activeCategory, timeRange, fetchPage])
+
+  // Load more articles (called from CategorySection infinite scroll)
+  const loadMore = useCallback(() => {
+    if (!activeCategory || loadingArticles || articles.length >= totalArticles) return
+    const id = fetchId.current // don't increment — same logical stream
+    setLoadingArticles(true)
+
+    fetchPage(activeCategory, timeRange, articles.length, id)
+      .then((res) => {
+        if (!res) return
+        setArticles((prev) => sortArticles([...prev, ...res.articles]))
+        setTotalArticles(res.total)
+      })
+      .catch(() => {
+        if (fetchId.current === id) setError('Failed to load more articles.')
+      })
+      .finally(() => {
+        if (fetchId.current === id) setLoadingArticles(false)
+      })
+  }, [activeCategory, loadingArticles, articles.length, totalArticles, timeRange, fetchPage])
 
   const dateStr = new Date().toLocaleDateString(undefined, {
     weekday: 'long',
@@ -191,7 +270,7 @@ function App() {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {loading && <SkeletonGrid />}
+        {(loading || (loadingArticles && articles.length === 0)) && <SkeletonGrid />}
 
         {error && (
           <div className="mt-8 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm text-center">
@@ -199,18 +278,25 @@ function App() {
           </div>
         )}
 
-        {!loading && !error && activeCategory && articlesByCategory[activeCategory] && (
+        {!loading && !error && activeCategory && articles.length > 0 && (
           <div
             key={activeCategory}
             className={slideDir === 'left' ? 'animate-slide-in-right' : 'animate-slide-in-left'}
           >
             <CategorySection
               category={activeCategory}
-              articles={articlesByCategory[activeCategory]}
-              sinceDate={getSinceDate(timeRange)}
-              untilDate={getUntilDate(timeRange)}
+              articles={articles}
+              hasMore={articles.length < totalArticles}
+              loadingMore={loadingArticles}
+              onLoadMore={loadMore}
             />
           </div>
+        )}
+
+        {!loading && !loadingArticles && !error && activeCategory && articles.length === 0 && (
+          <p className="text-center text-gray-400 dark:text-gray-500 py-20 text-sm">
+            No articles in this time range yet.
+          </p>
         )}
       </main>
     </div>
