@@ -9,12 +9,29 @@ def _load_config() -> dict:
         return yaml.safe_load(f)
 
 
+def get_url(name: str) -> str | None:
+    """Return the URL for the source matching the given name (case-insensitive)."""
+    config = _load_config()
+    for category in config.get("categories", []):
+        for source in category.get("sources", []):
+            if source["name"].lower() == name.lower():
+                return source.get("url")
+    return None
 
-def get_all_urls() -> list[tuple[str, str]]:
-    """Return a flat list of (name, url) tuples from every category."""
+def get_rss(name: str) -> list[str] | None:
+    """Return the list of RSS feed URLs for the source matching the given name (case-insensitive)."""
+    config = _load_config()
+    for category in config.get("categories", []):
+        for source in category.get("sources", []):
+            if source["name"].lower() == name.lower():
+                return source.get("rss")
+    return None
+
+def get_all_sites() -> list[str]:
+    """Return a list of all site names."""
     config = _load_config()
     return [
-        (source["name"], source["url"])
+        source["name"]
         for category in config.get("categories", [])
         for source in category.get("sources", [])
     ]
@@ -57,13 +74,4 @@ def get_filter(name: str) -> list[str] | None:
         for source in category.get("sources", []):
             if source["name"].lower() == name.lower():
                 return source.get("filter", [])
-    return None
-
-def get_rss(name: str) -> list[str] | None:
-    """Return the RSS feed URL list for the source matching the given name (case-insensitive)."""
-    config = _load_config()
-    for category in config.get("categories", []):
-        for source in category.get("sources", []):
-            if source["name"].lower() == name.lower():
-                return source.get("rss", [])
     return None

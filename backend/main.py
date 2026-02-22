@@ -9,7 +9,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from config import get_all_urls, get_sites_by_category
+import config
 import db 
 from estimateRelevance import async_process_articles
 from scrapeSite import scrape
@@ -24,11 +24,20 @@ scheduler = AsyncIOScheduler()
 # --- Background tasks ---
 
 
-async def task_scrape_all() -> None:
+async def task_scrape_no_rss() -> None:
     """Scrape all sources from config and save new articles to DB."""
     tasks = []
-    for name, url in get_all_urls():
-        tasks.append(asyncio.to_thread(scrape, name, url))
+    for name in config.get_all_sites():
+        if not config.get_rss(name):
+            tasks.append(asyncio.to_thread(scrape, name))
+    await asyncio.gather(*tasks)
+
+async def task_scrape_rss() -> None:
+    """Scrape all sources from config and save new articles to DB."""
+    tasks = []
+    for name in config.get_all_sites():
+        if config.get_rss(name):
+            tasks.append(asyncio.to_thread(scrape, name))
     await asyncio.gather(*tasks)
 
 
@@ -47,9 +56,15 @@ def task_cleanup_old() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     scheduler.add_job(
-        task_scrape_all,
-        IntervalTrigger(minutes=60, start_date=datetime.now()+timedelta(minutes=1)),
-        id="scrape",
+        task_scrape_no_rss,
+        IntervalTrigger(minutes=60, start_date=datetime.now()+timedelta(minutes=5)),
+        id="scrape_no_rss",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        task_scrape_rss,
+        IntervalTrigger(minutes=10, start_date=datetime.now()+timedelta(minutes=1)),
+        id="scrape_rss",
         replace_existing=True,
     )
     scheduler.add_job(
@@ -98,7 +113,7 @@ def list_articles_by_category(
     limit: int = 1000,
     offset: int = 0,
 ):
-    sites = get_sites_by_category(category)
+    sites = config.get_sites_by_category(category)
     articles, total = db.get_articles_by_sites_paginated(sites, since, until, limit, offset)
     return {"articles": articles, "total": total}
 

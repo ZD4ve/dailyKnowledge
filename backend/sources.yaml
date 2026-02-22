@@ -4,16 +4,9 @@ categories:
       - name: "Telex"
         url: "telex.hu"
         rss:
-          - "https://telex.hu/rss/belfold"
-          - "https://telex.hu/rss/defacto"
-          - "https://telex.hu/rss/direkt36"
+          - https://telex.hu/rss?filters=%7B%22superTagSlugs%22%3A%5B%22belfold%22%2C%22defacto%22%2C%22direkt36%22%5D%2C%22parentId%22%3A%5B%22null%22%5D%7D&perPage=50
         preference: "Kiemelt prioritás: Választási eredmények, közvélemény-kutatások, új törvények elfogadása, költségvetési és makrogazdasági adatok, miniszteri lemondások. Közepes prioritás: Parlamenti viták, pártok sajtótájékoztatói. Alacsony prioritás (ignoráld): Bűnügyek, balesetek, kis színes hírek, időjárás. KIVÉTEL: Csak akkor vegyél figyelembe bűnügyet, ha az kormányválságot okoz vagy súlyos korrupciót tár fel."
-        filter:
-          - "belfold"
-          - "defacto"
-          - "direkt36"
         language: "Hungarian"
-
 
       - name: "Index"
         url: "index.hu"
@@ -21,8 +14,6 @@ categories:
           - "https://index.hu/belfold/rss/"
         preference: "Fókuszálj a 'Hard News' kategóriára: Törvényhozás, adóváltozások, sztrájkok, kritikus infrastruktúra leállása, diplomáciai konfliktusok. Csak azokat a híreket emeld ki, amelyek közvetlen hatással vannak az ország működésére vagy a gazdaságra. Kezeld alacsony prioritásként a hatásvadász címeket, ahol a tartalom csak spekuláció. A rendőrségi és tűzoltósági híreket (kék hírek) teljesen hagyd figyelmen kívül, kivéve terrorveszély esetén."
         language: "Hungarian"
-        filter:
-          - "belfold"
 
       - name: "Válasz Online"
         url: "valaszonline.hu"
@@ -46,8 +37,6 @@ categories:
           - "https://24.hu/belfold/feed/"
         preference: "Szigorú szűrés: Kizárólag akkor emeld ki a cikket, ha az oknyomozó újságírás eredménye (korrupció, visszaélés feltárása), választási csalásról szól, vagy jelentős gazdasági bejelentést tartalmaz. Minden más téma (baleset, celeb, napi daráló, véleménycikk) alacsony prioritású. A rendőrségi rovat hírei tiltólistásak."
         language: "Hungarian"
-        filter:
-          - "belfold"
 
 
   - name: "Gazdaság"
@@ -55,14 +44,14 @@ categories:
       - name: "Financial Times"
         url: "ft.com"
         rss:
-          - "https://www.ft.com/rss/home"
+          - "https://www.ft.com/rss/home/international"
         preference: "High Priority: EU regulatory changes (antitrust, AI act, Green Deal), Defense sector funding and contracts, Tech sector earnings of major players, Central Bank rate decisions (ECB/Fed). Medium Priority: General market summaries. Low Priority (Ignore): Lifestyle, Arts, Opinion pieces by non-economists. Goal: Identify volatility triggers for an EU-based investor."
         language: "English"
 
       - name: "Reuters Business"
         url: "reuters.com"
         rss:
-          - "https://feeds.reuters.com/reuters/businessNews"
+          - "https://news.google.com/rss/search?q=site:reuters.com/business"
         preference: "Top Priority Triggers: Mergers & Acquisitions deals in Tech/Defense, Supply chain disruptions (semiconductors, energy), Inflation data releases, sudden currency fluctuations (EUR/USD). Downrank: 'Analysis' pieces that merely summarize past events without forward-looking value. Strictly factual, market-moving news only."
         language: "English"
 
@@ -82,7 +71,7 @@ categories:
       - name: "AP News"
         url: "apnews.com"
         rss:
-          - "https://openrss.org/apnews.com"
+          - "https://rsshub.app/apnews/topics/world-news"
         preference: "Critical Importance: Declaration of war, signing of peace treaties or alliances, coup d'états, results of national elections in major powers, natural disasters with global infrastructure impact. Low Importance: Local crime stories anywhere in the world, human interest stories, minor diplomatic spats. Focus strictly on border-altering or regime-changing events."
         language: "English"
 
