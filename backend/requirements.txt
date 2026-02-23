@@ -1,4 +1,6 @@
 newspaper4k[all] @ git+https://github.com/ZD4ve/newspaper4k.git
+gnews
+cloudscraper
 pyyaml
 openai
 python-dotenv

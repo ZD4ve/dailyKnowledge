@@ -34,9 +34,11 @@ categories:
       - name: "24.hu"
         url: "24.hu"
         rss:
-          - "https://24.hu/belfold/feed/"
+          - "https://24.hu/feed/"
         preference: "Szigorú szűrés: Kizárólag akkor emeld ki a cikket, ha az oknyomozó újságírás eredménye (korrupció, visszaélés feltárása), választási csalásról szól, vagy jelentős gazdasági bejelentést tartalmaz. Minden más téma (baleset, celeb, napi daráló, véleménycikk) alacsony prioritású. A rendőrségi rovat hírei tiltólistásak."
         language: "Hungarian"
+        filter:
+          - "belfold"
 
 
   - name: "Gazdaság"
@@ -50,18 +52,14 @@ categories:
 
       - name: "Reuters Business"
         url: "reuters.com"
-        rss:
-          - "https://news.google.com/rss/search?q=site:reuters.com/business"
+        google: reuters.com/business
         preference: "Top Priority Triggers: Mergers & Acquisitions deals in Tech/Defense, Supply chain disruptions (semiconductors, energy), Inflation data releases, sudden currency fluctuations (EUR/USD). Downrank: 'Analysis' pieces that merely summarize past events without forward-looking value. Strictly factual, market-moving news only."
         language: "English"
 
+      #TODO: download fails, replace
       - name: "The Economist"
         url: "economist.com"
-        rss:
-          - "https://www.economist.com/leaders/rss.xml"
-          - "https://www.economist.com/briefing/rss.xml"
-          - "https://www.economist.com/international/rss.xml"
-          - "https://www.economist.com/finance-and-economics/rss.xml"
+        google: economist.com
         preference: "High Priority: Articles discussing long-term shifts in Global Trade (de-globalization), Geopolitical impacts on supply chains, and major elections in G20 countries. Focus on the 'Leaders' and 'Briefing' sections. Ignore: Book reviews, localized cultural stories, and minor country politics unless it affects the global economy."
         language: "English"
 
@@ -70,12 +68,11 @@ categories:
     sources:
       - name: "AP News"
         url: "apnews.com"
-        rss:
-          - "https://rsshub.app/apnews/topics/world-news"
+        google: apnews.com/world-news
         preference: "Critical Importance: Declaration of war, signing of peace treaties or alliances, coup d'états, results of national elections in major powers, natural disasters with global infrastructure impact. Low Importance: Local crime stories anywhere in the world, human interest stories, minor diplomatic spats. Focus strictly on border-altering or regime-changing events."
         language: "English"
 
-      - name: "Al Jazeera English"
+      - name: "Al Jazeera"
         url: "aljazeera.com"
         rss:
           - "https://www.aljazeera.com/xml/rss/all.xml"

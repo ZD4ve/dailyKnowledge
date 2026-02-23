@@ -24,7 +24,7 @@ scheduler = AsyncIOScheduler()
 # --- Background tasks ---
 
 
-async def task_scrape_no_rss() -> None:
+async def task_scrape_crawl() -> None:
     """Scrape all sources from config and save new articles to DB."""
     tasks = []
     for name in config.get_all_sites():
@@ -40,6 +40,14 @@ async def task_scrape_rss() -> None:
             tasks.append(asyncio.to_thread(scrape, name))
     await asyncio.gather(*tasks)
 
+async def task_scrape_google() -> None:
+    """Scrape all sources from config and save new articles to DB."""
+    # TODO: If we have more gnews sources, might hit rate-limit
+    tasks = []
+    for name in config.get_all_sites():
+        if config.get_google(name):
+            tasks.append(asyncio.to_thread(scrape, name))
+    await asyncio.gather(*tasks)
 
 async def task_score_unscored() -> None:
     """Score all articles that have not been scored yet."""
@@ -56,15 +64,21 @@ def task_cleanup_old() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     scheduler.add_job(
-        task_scrape_no_rss,
-        IntervalTrigger(minutes=60, start_date=datetime.now()+timedelta(minutes=5)),
-        id="scrape_no_rss",
+        task_scrape_crawl,
+        IntervalTrigger(minutes=60, start_date=datetime.now()+timedelta(minutes=8)),
+        id="scrape_crawl",
         replace_existing=True,
     )
     scheduler.add_job(
         task_scrape_rss,
         IntervalTrigger(minutes=10, start_date=datetime.now()+timedelta(minutes=1)),
         id="scrape_rss",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        task_scrape_google,
+        IntervalTrigger(minutes=30, start_date=datetime.now()+timedelta(minutes=3)),
+        id="scrape_google",
         replace_existing=True,
     )
     scheduler.add_job(

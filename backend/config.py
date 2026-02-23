@@ -27,6 +27,15 @@ def get_rss(name: str) -> list[str] | None:
                 return source.get("rss")
     return None
 
+def get_google(name: str) -> str | None:
+    """Return the Google News search query for the source matching the given name (case-insensitive)."""
+    config = _load_config()
+    for category in config.get("categories", []):
+        for source in category.get("sources", []):
+            if source["name"].lower() == name.lower():
+                return source.get("google")
+    return None
+
 def get_all_sites() -> list[str]:
     """Return a list of all site names."""
     config = _load_config()

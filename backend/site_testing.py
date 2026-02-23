@@ -1,10 +1,13 @@
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG, force=True)
 
+import scrapeSite
+scrapeSite.scrape("AP News")
+
+"""
 import newspaper
-
 try:
-    testSource = newspaper.build('https://economist.com', memoize_articles=True, number_threads=1, http_success_only=True)
+    testSource = newspaper.build('https://economist.com', memorize_articles=False, number_threads=1, http_success_only=True)
 except Exception as e:
     print(f"Error building source: {e}")
     exit()
@@ -20,5 +23,5 @@ for article in articles:
     print('----------------------------------------')
     print(article.title)
     print(article.text[:200])
+"""
 
- 
