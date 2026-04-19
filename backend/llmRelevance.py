@@ -121,6 +121,11 @@ async def async_estimate(
     response = await client.chat.completions.create(
         model=MODEL,
         messages=messages,
+        extra_body={
+            "reasoning": {
+                "effort": "xhigh"
+            }
+        },
         response_format={
             "type": "json_schema",
             "json_schema": {
