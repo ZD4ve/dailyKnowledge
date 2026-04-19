@@ -270,33 +270,37 @@ function App() {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {(loading || (loadingArticles && articles.length === 0)) && <SkeletonGrid />}
+        {loading && <SkeletonGrid />}
 
-        {error && (
-          <div className="mt-8 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm text-center">
-            {error}
-          </div>
-        )}
-
-        {!loading && !error && activeCategory && articles.length > 0 && (
+        {!loading && activeCategory && (
           <div
             key={activeCategory}
             className={slideDir === 'left' ? 'animate-slide-in-right' : 'animate-slide-in-left'}
           >
-            <CategorySection
-              category={activeCategory}
-              articles={articles}
-              hasMore={articles.length < totalArticles}
-              loadingMore={loadingArticles}
-              onLoadMore={loadMore}
-            />
-          </div>
-        )}
+            {loadingArticles && articles.length === 0 && <SkeletonGrid />}
 
-        {!loading && !loadingArticles && !error && activeCategory && articles.length === 0 && (
-          <p className="text-center text-gray-400 dark:text-gray-500 py-20 text-sm">
-            No articles in this time range yet.
-          </p>
+            {error && (
+              <div className="mt-8 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm text-center">
+                {error}
+              </div>
+            )}
+
+            {!error && articles.length > 0 && (
+              <CategorySection
+                category={activeCategory}
+                articles={articles}
+                hasMore={articles.length < totalArticles}
+                loadingMore={loadingArticles}
+                onLoadMore={loadMore}
+              />
+            )}
+
+            {!loadingArticles && !error && articles.length === 0 && (
+              <p className="text-center text-gray-400 dark:text-gray-500 py-20 text-sm">
+                No articles in this time range yet.
+              </p>
+            )}
+          </div>
         )}
       </main>
     </div>
