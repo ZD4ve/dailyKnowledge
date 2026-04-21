@@ -1,9 +1,10 @@
 import os
 import asyncio
-import json
+import logging
+import instructor
 from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 from dotenv import load_dotenv
 
 from config import get_preference, get_language
@@ -11,17 +12,26 @@ from helper import dataArticle
 
 # region SETUP
 load_dotenv()
-BASE_URL: str = os.getenv("OPENAI_API_BASE") # pyright: ignore[reportAssignmentType]
-MODEL: str = os.getenv("OPENAI_MODEL") # pyright: ignore[reportAssignmentType]
-API_KEY: str = os.getenv("OPENAI_API_KEY")# pyright: ignore[reportAssignmentType]
-RATE_LIMIT: int = int(os.getenv("OPENAI_RATE_LIMIT", "10")) # pyright: ignore[reportAssignmentType]
+
+logger = logging.getLogger(__name__)
+
+BASE_URL = os.getenv("LLM_API_BASE")
+MODEL = os.getenv("LLM_MODEL")
+API_KEY = os.getenv("LLM_API_KEY")
+rate_limit_raw = os.getenv("LLM_RATE_LIMIT") or "10"
+RATE_LIMIT: int = int(rate_limit_raw)
 
 if BASE_URL is None or MODEL is None or API_KEY is None:
-    raise ValueError("Missing required environment variables (OPENAI_API_BASE, OPENAI_MODEL, OPENAI_API_KEY). Please check your .env file or environment configuration.")
+    raise ValueError(
+        "Missing required environment variables. Set LLM_API_BASE, LLM_MODEL, and LLM_API_KEY."
+    )
 
-client = AsyncOpenAI(
-    base_url=BASE_URL,
-    api_key=API_KEY,
+client = instructor.from_openai(
+    AsyncOpenAI(
+        base_url=BASE_URL,
+        api_key=API_KEY,
+    ),
+    mode=instructor.Mode.JSON,
 )
 
 
@@ -114,34 +124,27 @@ async def async_estimate(
     """Async version of estimate(). Respects rate limiting via the shared rate_limiter."""
     messages, preference = _build_messages(article)
     if not messages:
+        if preference is None:
+            logger.info("Skipping LLM scoring for article '%s': missing source preference", article.url)
         return None
 
     await rate_limiter.acquire()
 
-    response = await client.chat.completions.create(
-        model=MODEL,
-        messages=messages,
-        extra_body={
-            "reasoning": {
-                "effort": "xhigh"
-            }
-        },
-        response_format={
-            "type": "json_schema",
-            "json_schema": {
-                "name": "relevance_score",
-                "strict": True,
-                "schema": RelevanceScore.model_json_schema(),
-            },
-        },
-    )
-
     try:
-        raw = response.choices[0].message.content
-        if not raw:
-            return None
-        parsed = json.loads(raw)
-        return int(parsed["score"]), parsed["summary"]
-    except (KeyError, json.JSONDecodeError, TypeError):
+        response = await client.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            response_model=RelevanceScore,
+            extra_body={
+                "reasoning": {
+                    "effort": "xhigh"
+                }
+            },
+        )
+        return response.score, response.summary
+    except ValidationError as exc:
+        logger.warning("Schema validation failed for article '%s': %s", article.url, exc)
         return None
-    
+    except Exception as exc:
+        logger.warning("LLM scoring failed for article '%s': %s", article.url, exc)
+        return None

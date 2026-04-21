@@ -2,7 +2,8 @@ newspaper4k[all] @ git+https://github.com/ZD4ve/newspaper4k.git
 gnews
 cloudscraper
 pyyaml
-openai
+openai>=1.0.0,<2.0.0
+instructor>=1.0.0,<2.0.0
 python-dotenv
 fastapi
 uvicorn[standard]
