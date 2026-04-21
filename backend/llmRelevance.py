@@ -123,8 +123,10 @@ async def async_estimate(
     rate_limiter: AsyncRateLimiter = _default_rate_limiter,
 ) -> tuple[int, str] | None:
     """Async version of estimate(). Respects rate limiting via the shared rate_limiter."""
-    messages, _ = _build_messages(article)
+    messages, preference = _build_messages(article)
     if not messages:
+        if preference is None:
+            logger.info("Skipping LLM scoring for article '%s': missing source preference", article.url)
         return None
 
     await rate_limiter.acquire()
@@ -140,7 +142,7 @@ async def async_estimate(
                 }
             },
         )
-        return int(response.score), response.summary
+        return response.score, response.summary
     except ValidationError as exc:
         logger.warning("Schema validation failed for article '%s': %s", article.url, exc)
         return None
