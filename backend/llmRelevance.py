@@ -15,16 +15,15 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = os.getenv("LLM_API_BASE") or os.getenv("OPENAI_API_BASE")
-MODEL = os.getenv("LLM_MODEL") or os.getenv("OPENAI_MODEL")
-API_KEY = os.getenv("LLM_API_KEY") or os.getenv("OPENAI_API_KEY")
-rate_limit_raw = os.getenv("LLM_RATE_LIMIT") or os.getenv("OPENAI_RATE_LIMIT") or "10"
+BASE_URL = os.getenv("LLM_API_BASE")
+MODEL = os.getenv("LLM_MODEL")
+API_KEY = os.getenv("LLM_API_KEY")
+rate_limit_raw = os.getenv("LLM_RATE_LIMIT") or "10"
 RATE_LIMIT: int = int(rate_limit_raw)
 
 if BASE_URL is None or MODEL is None or API_KEY is None:
     raise ValueError(
-        "Missing required environment variables. Set LLM_API_BASE, LLM_MODEL, and LLM_API_KEY "
-        "(or legacy OPENAI_API_BASE, OPENAI_MODEL, and OPENAI_API_KEY)."
+        "Missing required environment variables. Set LLM_API_BASE, LLM_MODEL, and LLM_API_KEY."
     )
 
 client = instructor.from_openai(

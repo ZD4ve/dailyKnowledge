@@ -94,10 +94,6 @@ Set these in a `.env` file at the project root or pass them to Docker Compose:
 | `LLM_MODEL`        | **yes**  | —                        | Model name used for scoring. |
 | `LLM_API_KEY`      | **yes**  | —                        | API key for the LLM provider. |
 | `LLM_RATE_LIMIT`   | no       | `10`                     | Max LLM requests per minute. |
-| `OPENAI_API_BASE`  | no       | —                        | Legacy fallback for `LLM_API_BASE`. |
-| `OPENAI_MODEL`     | no       | —                        | Legacy fallback for `LLM_MODEL`. |
-| `OPENAI_API_KEY`   | no       | —                        | Legacy fallback for `LLM_API_KEY`. |
-| `OPENAI_RATE_LIMIT`| no       | —                        | Legacy fallback for `LLM_RATE_LIMIT`. |
 | `CORS_ORIGINS`     | no       | `http://localhost`       | Comma-separated allowed origins. |
 | `VITE_API_URL`     | no       | `http://localhost:5764`  | Backend URL the frontend uses in the browser. |
 
@@ -115,4 +111,3 @@ The frontend is served at `http://localhost:5763` and the API at `http://localho
 
 - **Daily category digest** — An LLM-generated summary for each category, produced once a day, that synthesizes the key developments across all articles scraped that day into a concise briefing. Gives you the big picture without reading every article.
 - **Top 5 picks per category** — At the end of each day, have the LLM select the five most important articles per category based on the category's preference prompt and which articles the user has already read on the days prior, surfacing what you shouldn't miss.
-
