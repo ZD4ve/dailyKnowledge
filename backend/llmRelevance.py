@@ -148,4 +148,3 @@ async def async_estimate(
     except Exception as exc:
         logger.warning("LLM scoring failed for article '%s': %s", article.url, exc)
         return None
-    
