@@ -46,13 +46,10 @@ def _build_messages(article: dataArticle) -> tuple[list[ChatCompletionMessagePar
     if preference is None:
         return [], None
 
-    language = get_language(article.site_name) or "English"
-
     system_msg = (
         "You are a strict relevance scorer and summarizer. "
         "You will receive the reader's interests and an article. "
-        f"CRITICAL RULE: The summary MUST be written entirely in {language}. "
-        f"Every word of the summary must be in {language} — no exceptions, no English unless the article is in English. "
+        f"CRITICAL RULE: The summary MUST be written entirely in English, only keep the names of people, places, and organizations in their original language. "
         "Write a short summary (2-3 sentences) that captures the most important information in the article. "
         "Focus on details NOT already obvious from the title. Do not repeat the title. "
         "Then rate how useful this article is to the reader from 0 to 9.\n\n"
